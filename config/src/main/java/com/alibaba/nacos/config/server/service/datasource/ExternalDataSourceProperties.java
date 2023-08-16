@@ -33,10 +33,12 @@ import static com.alibaba.nacos.common.utils.CollectionUtils.getOrDefault;
  * @author Nacos
  */
 public class ExternalDataSourceProperties {
-    
-    private static final String JDBC_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
-    
-    private static final String TEST_QUERY = "SELECT 1";
+
+    //update
+    private String jdbcDriverName;
+
+    //update
+    private String testQuery;
     
     private Integer num;
     
@@ -61,6 +63,24 @@ public class ExternalDataSourceProperties {
     public void setPassword(List<String> password) {
         this.password = password;
     }
+
+    //add new
+    public void setTestQuery(String testQuery) {
+        if (StringUtils.isBlank(testQuery)) {
+            this.testQuery = "SELECT 1";
+        } else {
+            this.testQuery = testQuery;
+        }
+    }
+
+    //add new
+    public void setJdbcDriverName(String jdbcDriverName) {
+        if (StringUtils.isBlank(jdbcDriverName)) {
+            this.jdbcDriverName = "com.mysql.cj.jdbc.Driver";
+        } else {
+            this.jdbcDriverName = jdbcDriverName;
+        }
+    }
     
     /**
      * Build serveral HikariDataSource.
@@ -80,14 +100,14 @@ public class ExternalDataSourceProperties {
             Preconditions.checkArgument(url.size() >= currentSize, "db.url.%s is null", index);
             DataSourcePoolProperties poolProperties = DataSourcePoolProperties.build(environment);
             if (StringUtils.isEmpty(poolProperties.getDataSource().getDriverClassName())) {
-                poolProperties.setDriverClassName(JDBC_DRIVER_NAME);
+                poolProperties.setDriverClassName(this.jdbcDriverName);
             }
             poolProperties.setJdbcUrl(url.get(index).trim());
             poolProperties.setUsername(getOrDefault(user, index, user.get(0)).trim());
             poolProperties.setPassword(getOrDefault(password, index, password.get(0)).trim());
             HikariDataSource ds = poolProperties.getDataSource();
             if (StringUtils.isEmpty(ds.getConnectionTestQuery())) {
-                ds.setConnectionTestQuery(TEST_QUERY);
+                ds.setConnectionTestQuery(this.testQuery);
             }
             dataSources.add(ds);
             callback.accept(ds);
