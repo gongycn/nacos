@@ -1,23 +1,11 @@
 package com.alibaba.nacos.plugin.datasource.impl.oracle;
 
+import com.alibaba.nacos.common.utils.NamespaceUtil;
 import com.alibaba.nacos.plugin.datasource.constants.DataSourceConstant;
 import com.alibaba.nacos.plugin.datasource.mapper.GroupCapacityMapper;
 
 public class GroupCapacityMapperByOracle extends OracleAbstractMapper implements GroupCapacityMapper {
 
-
-	@Override
-	public String insertIntoSelectByWhere() {
-		return "INSERT INTO group_capacity (group_id, quota,usage, max_size, max_aggr_count, max_aggr_size, gmt_create,"
-				+ " gmt_modified) SELECT ?, ?, count(*), ?, ?, ?, ?, ? FROM config_info WHERE group_id=? AND tenant_id is null";
-	}
-
-
-	@Override
-	public String updateUsageByWhere() {
-		return "UPDATE group_capacity SET usage = (SELECT count(*) FROM config_info WHERE group_id=? AND tenant_id is null),"
-				+ " gmt_modified = ? WHERE group_id= ?";
-	}
 
 	@Override
 	public String selectGroupInfoBySize() {
@@ -29,4 +17,21 @@ public class GroupCapacityMapperByOracle extends OracleAbstractMapper implements
 		return DataSourceConstant.ORACLE;
 	}
 
+	/**
+	 * 处理了tenant_id作为条件时为空字符串的问题
+	 */
+	@Override
+	public String insertIntoSelectByWhere() {
+		return "INSERT INTO group_capacity (group_id, quota,usage, max_size, max_aggr_count, max_aggr_size, gmt_create,"
+				+ " gmt_modified) SELECT ?, ?, count(*), ?, ?, ?, ?, ? FROM config_info WHERE group_id=? AND tenant_id is null";
+	}
+
+	/**
+	 * 处理了tenant_id作为条件时为空字符串的问题
+	 */
+	@Override
+	public String updateUsageByWhere() {
+		return "UPDATE group_capacity SET usage = (SELECT count(*) FROM config_info WHERE group_id=? AND tenant_id is null),"
+				+ " gmt_modified = ? WHERE group_id= ?";
+	}
 }

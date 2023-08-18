@@ -18,4 +18,12 @@ public class ConfigInfoTagMapperByOracle extends OracleAbstractMapper implements
 		return DataSourceConstant.ORACLE;
 	}
 
+	/**
+	 * 处理了tenant_id作为条件时为空字符串的问题
+	 */
+	public String updateConfigInfo4TagCas() {
+		return "UPDATE config_info_tag SET content = ?, md5 = ?, src_ip = ?,src_user = ?,gmt_modified = ?,app_name = ? "
+				+ "WHERE data_id = ? AND group_id = ? AND nvl(tenant_id, '" + TENANT_NULL + "') = nvl(?, '" + TENANT_NULL + "') AND tag_id = ? AND (md5 = ? OR md5 IS NULL OR md5 = '')";
+	}
+
 }

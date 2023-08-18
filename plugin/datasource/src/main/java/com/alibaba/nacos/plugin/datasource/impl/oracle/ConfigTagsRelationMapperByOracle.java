@@ -19,7 +19,7 @@ public class ConfigTagsRelationMapperByOracle extends OracleAbstractMapper imple
 				"SELECT a.id,a.data_id,a.group_id,a.tenant_id,a.app_name,a.content FROM config_info  a LEFT JOIN "
 						+ "config_tags_relation b ON a.id=b.id";
 
-		where.append(" a.tenant_id=? ");
+		where.append(" nvl(a.tenant_id, '" + TENANT_NULL + "') = nvl(?, '" + TENANT_NULL + "') ");
 
 		if (StringUtils.isNotBlank(dataId)) {
 			where.append(" AND a.data_id=? ");
@@ -55,7 +55,7 @@ public class ConfigTagsRelationMapperByOracle extends OracleAbstractMapper imple
 		final String sqlFetchRows = "SELECT a.id,a.data_id,a.group_id,a.tenant_id,a.app_name,a.content "
 				+ "FROM config_info a LEFT JOIN config_tags_relation b ON a.id=b.id ";
 
-		where.append(" a.tenant_id LIKE ? ");
+		where.append(" nvl(a.tenant_id, '" + TENANT_NULL + "') LIKE nvl(?, '" + TENANT_NULL + "') ");
 		if (!StringUtils.isBlank(dataId)) {
 			where.append(" AND a.data_id LIKE ? ");
 		}
@@ -83,6 +83,77 @@ public class ConfigTagsRelationMapperByOracle extends OracleAbstractMapper imple
 	@Override
 	public String getDataSource() {
 		return DataSourceConstant.ORACLE;
+	}
+
+	/**
+	 * 处理了tenant_id作为条件时为空字符串的问题
+	 */
+	public String findConfigInfo4PageCountRows(final Map<String, String> params, int tagSize) {
+		final String appName = params.get("appName");
+		final String dataId = params.get("dataId");
+		final String group = params.get("group");
+		final String content = params.get("content");
+		StringBuilder where = new StringBuilder(" WHERE ");
+		final String sqlCount = "SELECT count(*) FROM config_info  a LEFT JOIN config_tags_relation b ON a.id=b.id";
+
+		where.append(" nvl(a.tenant_id, '" + TENANT_NULL + "') = nvl(?, '" + TENANT_NULL + "') ");
+
+		if (StringUtils.isNotBlank(dataId)) {
+			where.append(" AND a.data_id=? ");
+		}
+		if (StringUtils.isNotBlank(group)) {
+			where.append(" AND a.group_id=? ");
+		}
+		if (StringUtils.isNotBlank(appName)) {
+			where.append(" AND a.app_name=? ");
+		}
+		if (!StringUtils.isBlank(content)) {
+			where.append(" AND a.content LIKE ? ");
+		}
+		where.append(" AND b.tag_name IN (");
+		for (int i = 0; i < tagSize; i++) {
+			if (i != 0) {
+				where.append(", ");
+			}
+			where.append('?');
+		}
+		where.append(") ");
+		return sqlCount + where;
+	}
+
+	/**
+	 * 处理了tenant_id作为条件时为空字符串的问题
+	 */
+	public String findConfigInfoLike4PageCountRows(final Map<String, String> params, int tagSize) {
+		final String appName = params.get("appName");
+		final String content = params.get("content");
+		final String dataId = params.get("dataId");
+		final String group = params.get("group");
+		StringBuilder where = new StringBuilder(" WHERE ");
+		final String sqlCountRows = "SELECT count(*) FROM config_info  a LEFT JOIN config_tags_relation b ON a.id=b.id ";
+		where.append(" nvl(a.tenant_id, '" + TENANT_NULL + "') LIKE nvl(?, '" + TENANT_NULL + "') ");
+		if (!StringUtils.isBlank(dataId)) {
+			where.append(" AND a.data_id LIKE ? ");
+		}
+		if (!StringUtils.isBlank(group)) {
+			where.append(" AND a.group_id LIKE ? ");
+		}
+		if (!StringUtils.isBlank(appName)) {
+			where.append(" AND a.app_name = ? ");
+		}
+		if (!StringUtils.isBlank(content)) {
+			where.append(" AND a.content LIKE ? ");
+		}
+
+		where.append(" AND b.tag_name IN (");
+		for (int i = 0; i < tagSize; i++) {
+			if (i != 0) {
+				where.append(", ");
+			}
+			where.append('?');
+		}
+		where.append(") ");
+		return sqlCountRows + where;
 	}
 
 }

@@ -17,4 +17,12 @@ public class ConfigInfoBetaMapperByOracle extends OracleAbstractMapper implement
 		return DataSourceConstant.ORACLE;
 	}
 
+	/**
+	 * 处理了tenant_id作为条件时为空字符串的问题
+	 */
+	public String updateConfigInfo4BetaCas() {
+		return "UPDATE config_info_beta SET content = ?,md5 = ?,beta_ips = ?,src_ip = ?,src_user = ?,gmt_modified = ?,app_name = ? "
+				+ "WHERE data_id = ? AND group_id = ? AND nvl(tenant_id, '" + TENANT_NULL + "') = nvl(?, '" + TENANT_NULL + "') AND (md5 = ? OR md5 is null OR md5 = '')";
+	}
+
 }
