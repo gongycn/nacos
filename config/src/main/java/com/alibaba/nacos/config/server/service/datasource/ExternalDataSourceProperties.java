@@ -34,54 +34,34 @@ import static com.alibaba.nacos.common.utils.CollectionUtils.getOrDefault;
  */
 public class ExternalDataSourceProperties {
 
-    //update
-    private String jdbcDriverName;
+    private static final String JDBC_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
 
-    //update
-    private String testQuery;
-    
+    private static final String TEST_QUERY = "SELECT 1";
+
     private Integer num;
-    
+
     private List<String> url = new ArrayList<>();
-    
+
     private List<String> user = new ArrayList<>();
-    
+
     private List<String> password = new ArrayList<>();
-    
+
     public void setNum(Integer num) {
         this.num = num;
     }
-    
+
     public void setUrl(List<String> url) {
         this.url = url;
     }
-    
+
     public void setUser(List<String> user) {
         this.user = user;
     }
-    
+
     public void setPassword(List<String> password) {
         this.password = password;
     }
 
-    //add new
-    public void setTestQuery(String testQuery) {
-        if (StringUtils.isBlank(testQuery)) {
-            this.testQuery = "SELECT 1";
-        } else {
-            this.testQuery = testQuery;
-        }
-    }
-
-    //add new
-    public void setJdbcDriverName(String jdbcDriverName) {
-        if (StringUtils.isBlank(jdbcDriverName)) {
-            this.jdbcDriverName = "com.mysql.cj.jdbc.Driver";
-        } else {
-            this.jdbcDriverName = jdbcDriverName;
-        }
-    }
-    
     /**
      * Build serveral HikariDataSource.
      *
@@ -100,14 +80,14 @@ public class ExternalDataSourceProperties {
             Preconditions.checkArgument(url.size() >= currentSize, "db.url.%s is null", index);
             DataSourcePoolProperties poolProperties = DataSourcePoolProperties.build(environment);
             if (StringUtils.isEmpty(poolProperties.getDataSource().getDriverClassName())) {
-                poolProperties.setDriverClassName(this.jdbcDriverName);
+                poolProperties.setDriverClassName(JDBC_DRIVER_NAME);
             }
             poolProperties.setJdbcUrl(url.get(index).trim());
             poolProperties.setUsername(getOrDefault(user, index, user.get(0)).trim());
             poolProperties.setPassword(getOrDefault(password, index, password.get(0)).trim());
             HikariDataSource ds = poolProperties.getDataSource();
             if (StringUtils.isEmpty(ds.getConnectionTestQuery())) {
-                ds.setConnectionTestQuery(this.testQuery);
+                ds.setConnectionTestQuery(TEST_QUERY);
             }
             dataSources.add(ds);
             callback.accept(ds);
@@ -115,9 +95,9 @@ public class ExternalDataSourceProperties {
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(dataSources), "no datasource available");
         return dataSources;
     }
-    
+
     interface Callback<D> {
-        
+
         /**
          * Perform custom logic.
          *
