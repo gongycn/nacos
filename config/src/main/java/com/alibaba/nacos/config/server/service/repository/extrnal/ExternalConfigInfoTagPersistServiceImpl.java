@@ -54,15 +54,15 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
 @Conditional(value = ConditionOnExternalStorage.class)
 @Service("externalConfigInfoTagPersistServiceImpl")
 public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPersistService {
-    
+
     private DataSourceService dataSourceService;
-    
+
     protected JdbcTemplate jt;
-    
+
     protected TransactionTemplate tjt;
-    
+
     private MapperManager mapperManager;
-    
+
     public ExternalConfigInfoTagPersistServiceImpl() {
         this.dataSourceService = DynamicDataSource.getInstance().getDataSource();
         this.jt = dataSourceService.getJdbcTemplate();
@@ -71,15 +71,15 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
                 false);
         this.mapperManager = MapperManager.instance(isDataSourceLogEnable);
     }
-    
+
     @Override
     public <E> PaginationHelper<E> createPaginationHelper() {
         return new ExternalStoragePaginationHelperImpl<>(jt);
     }
-    
+
     @Override
     public void addConfigInfo4Tag(ConfigInfo configInfo, String tag, String srcIp, String srcUser, Timestamp time,
-            boolean notify) {
+                                  boolean notify) {
         String appNameTmp = StringUtils.isBlank(configInfo.getAppName()) ? StringUtils.EMPTY : configInfo.getAppName();
         String tenantTmp = StringUtils.isBlank(configInfo.getTenant()) ? StringUtils.EMPTY : configInfo.getTenant();
         String tagTmp = StringUtils.isBlank(tag) ? StringUtils.EMPTY : tag.trim();
@@ -96,20 +96,20 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             throw e;
         }
     }
-    
+
     @Override
     public void insertOrUpdateTag(final ConfigInfo configInfo, final String tag, final String srcIp,
-            final String srcUser, final Timestamp time, final boolean notify) {
+                                  final String srcUser, final Timestamp time, final boolean notify) {
         try {
             addConfigInfo4Tag(configInfo, tag, srcIp, null, time, notify);
         } catch (DataIntegrityViolationException ive) { // Unique constraint conflict
             updateConfigInfo4Tag(configInfo, tag, srcIp, null, time, notify);
         }
     }
-    
+
     @Override
     public boolean insertOrUpdateTagCas(final ConfigInfo configInfo, final String tag, final String srcIp,
-            final String srcUser, final Timestamp time, final boolean notify) {
+                                        final String srcUser, final Timestamp time, final boolean notify) {
         try {
             addConfigInfo4Tag(configInfo, tag, srcIp, null, time, notify);
             return true;
@@ -117,11 +117,11 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             return updateConfigInfo4TagCas(configInfo, tag, srcIp, null, time, notify);
         }
     }
-    
+
     @Override
     public void removeConfigInfoTag(final String dataId, final String group, final String tenant, final String tag,
-            final String srcIp, final String srcUser) {
-        String tenantTmp = StringUtils.isBlank(tenant) ? StringUtils.NULL : tenant;
+                                    final String srcIp, final String srcUser) {
+        String tenantTmp = StringUtils.isBlank(tenant) ? StringUtils.EMPTY : tenant;
         String tagTmp = StringUtils.isBlank(tag) ? StringUtils.EMPTY : tag;
         try {
             ConfigInfoTagMapper configInfoTagMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
@@ -133,10 +133,10 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             throw e;
         }
     }
-    
+
     @Override
     public void updateConfigInfo4Tag(ConfigInfo configInfo, String tag, String srcIp, String srcUser, Timestamp time,
-            boolean notify) {
+                                     boolean notify) {
         String appNameTmp = StringUtils.isBlank(configInfo.getAppName()) ? StringUtils.EMPTY : configInfo.getAppName();
         String tenantTmp = StringUtils.isBlank(configInfo.getTenant()) ? StringUtils.EMPTY : configInfo.getTenant();
         String tagTmp = StringUtils.isBlank(tag) ? StringUtils.EMPTY : tag.trim();
@@ -153,10 +153,10 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             throw e;
         }
     }
-    
+
     @Override
     public boolean updateConfigInfo4TagCas(ConfigInfo configInfo, String tag, String srcIp, String srcUser,
-            Timestamp time, boolean notify) {
+                                           Timestamp time, boolean notify) {
         String appNameTmp = StringUtils.isBlank(configInfo.getAppName()) ? StringUtils.EMPTY : configInfo.getAppName();
         String tenantTmp = StringUtils.isBlank(configInfo.getTenant()) ? StringUtils.EMPTY : configInfo.getTenant();
         String tagTmp = StringUtils.isBlank(tag) ? StringUtils.EMPTY : tag.trim();
@@ -172,11 +172,11 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             throw e;
         }
     }
-    
+
     @Override
     public ConfigInfoTagWrapper findConfigInfo4Tag(final String dataId, final String group, final String tenant,
-            final String tag) {
-        String tenantTmp = StringUtils.isBlank(tenant) ? StringUtils.NULL : tenant;
+                                                   final String tag) {
+        String tenantTmp = StringUtils.isBlank(tenant) ? StringUtils.EMPTY : tenant;
         String tagTmp = StringUtils.isBlank(tag) ? StringUtils.EMPTY : tag.trim();
         try {
             ConfigInfoTagMapper configInfoTagMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
@@ -192,7 +192,7 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
             throw e;
         }
     }
-    
+
     @Override
     public int configInfoTagCount() {
         ConfigInfoTagMapper configInfoTagMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
@@ -204,7 +204,7 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
         }
         return result.intValue();
     }
-    
+
     @Override
     public Page<ConfigInfoTagWrapper> findAllConfigInfoTagForDumpAll(final int pageNo, final int pageSize) {
         final int startRow = (pageNo - 1) * pageSize;
@@ -216,11 +216,11 @@ public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPer
         try {
             return helper.fetchPageLimit(sqlCountRows, sqlFetchRows, new Object[] {}, pageNo, pageSize,
                     CONFIG_INFO_TAG_WRAPPER_ROW_MAPPER);
-            
+
         } catch (CannotGetJdbcConnectionException e) {
             LogUtil.FATAL_LOG.error("[db-error] " + e, e);
             throw e;
         }
     }
-    
+
 }

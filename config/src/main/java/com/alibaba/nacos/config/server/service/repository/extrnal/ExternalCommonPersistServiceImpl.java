@@ -51,15 +51,15 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
 @Conditional(value = ConditionOnExternalStorage.class)
 @Service("externalOtherPersistServiceImpl")
 public class ExternalCommonPersistServiceImpl implements CommonPersistService {
-    
+
     private DataSourceService dataSourceService;
-    
+
     protected JdbcTemplate jt;
-    
+
     protected TransactionTemplate tjt;
-    
+
     private MapperManager mapperManager;
-    
+
     public ExternalCommonPersistServiceImpl() {
         this.dataSourceService = DynamicDataSource.getInstance().getDataSource();
         this.jt = dataSourceService.getJdbcTemplate();
@@ -68,23 +68,22 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
                 false);
         this.mapperManager = MapperManager.instance(isDataSourceLogEnable);
     }
-    
+
     @Override
     public void insertTenantInfoAtomic(String kp, String tenantId, String tenantName, String tenantDesc,
-            String createResoure, final long time) {
+                                       String createResoure, final long time) {
         try {
             TenantInfoMapper tenantInfoMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
                     TableConstant.TENANT_INFO);
-            Integer id = jt.queryForObject("select SEQ_TENANT_INFO.nextval from dual", Integer.class);
             jt.update(tenantInfoMapper.insert(
-                    Arrays.asList("id", "kp", "tenant_id", "tenant_name", "tenant_desc", "create_source", "gmt_create",
-                            "gmt_modified")), id, kp, tenantId, tenantName, tenantDesc, createResoure, time, time);
+                    Arrays.asList("kp", "tenant_id", "tenant_name", "tenant_desc", "create_source", "gmt_create",
+                            "gmt_modified")), kp, tenantId, tenantName, tenantDesc, createResoure, time, time);
         } catch (DataAccessException e) {
             LogUtil.FATAL_LOG.error("[db-error] " + e, e);
             throw e;
         }
     }
-    
+
     @Override
     public void removeTenantInfoAtomic(final String kp, final String tenantId) {
         try {
@@ -96,7 +95,7 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
             throw e;
         }
     }
-    
+
     @Override
     public void updateTenantNameAtomic(String kp, String tenantId, String tenantName, String tenantDesc) {
         try {
@@ -110,7 +109,7 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
             throw e;
         }
     }
-    
+
     @Override
     public List<TenantInfo> findTenantByKp(String kp) {
         TenantInfoMapper tenantInfoMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
@@ -129,7 +128,7 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public TenantInfo findTenantByKp(String kp, String tenantId) {
         TenantInfoMapper tenantInfoMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
@@ -148,7 +147,7 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public String generateLikeArgument(String s) {
         String fuzzySearchSign = "\\*";
@@ -159,7 +158,7 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
             return s;
         }
     }
-    
+
     @Override
     public boolean isExistTable(String tableName) {
         String sql = String.format("SELECT 1 FROM %s LIMIT 1", tableName);
@@ -170,7 +169,7 @@ public class ExternalCommonPersistServiceImpl implements CommonPersistService {
             return false;
         }
     }
-    
+
     @Override
     public int tenantInfoCountByTenantId(String tenantId) {
         if (Objects.isNull(tenantId)) {

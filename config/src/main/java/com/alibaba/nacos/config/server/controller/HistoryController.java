@@ -44,13 +44,13 @@ import java.util.List;
 @RestController
 @RequestMapping(Constants.HISTORY_CONTROLLER_PATH)
 public class HistoryController {
-    
+
     private final HistoryService historyService;
-    
+
     public HistoryController(HistoryService historyService) {
         this.historyService = historyService;
     }
-    
+
     /**
      * Query the list history config. notes:
      *
@@ -67,18 +67,18 @@ public class HistoryController {
     @GetMapping(params = "search=accurate")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
     public Page<ConfigHistoryInfo> listConfigHistory(@RequestParam("dataId") String dataId,
-            @RequestParam("group") String group,
-            @RequestParam(value = "tenant", required = false, defaultValue = StringUtils.NULL) String tenant,
-            @RequestParam(value = "appName", required = false) String appName,
-            @RequestParam(value = "pageNo", required = false) Integer pageNo,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize, ModelMap modelMap) {
+                                                     @RequestParam("group") String group,
+                                                     @RequestParam(value = "tenant", required = false, defaultValue = StringUtils.EMPTY) String tenant,
+                                                     @RequestParam(value = "appName", required = false) String appName,
+                                                     @RequestParam(value = "pageNo", required = false) Integer pageNo,
+                                                     @RequestParam(value = "pageSize", required = false) Integer pageSize, ModelMap modelMap) {
         pageNo = null == pageNo ? 1 : pageNo;
         pageSize = null == pageSize ? 100 : pageSize;
         pageSize = Math.min(500, pageSize);
         // configInfoBase has no appName field.
         return historyService.listConfigHistory(dataId, group, tenant, pageNo, pageSize);
     }
-    
+
     /**
      * Query the detailed configuration history information. notes:
      *
@@ -92,12 +92,12 @@ public class HistoryController {
     @GetMapping
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
     public ConfigHistoryInfo getConfigHistoryInfo(@RequestParam("dataId") String dataId,
-            @RequestParam("group") String group,
-            @RequestParam(value = "tenant", required = false, defaultValue = StringUtils.NULL) String tenant,
-            @RequestParam("nid") Long nid) throws AccessException {
+                                                  @RequestParam("group") String group,
+                                                  @RequestParam(value = "tenant", required = false, defaultValue = StringUtils.EMPTY) String tenant,
+                                                  @RequestParam("nid") Long nid) throws AccessException {
         return historyService.getConfigHistoryInfo(dataId, group, tenant, nid);
     }
-    
+
     /**
      * Query previous config history information. notes:
      *
@@ -112,12 +112,12 @@ public class HistoryController {
     @GetMapping(value = "/previous")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
     public ConfigHistoryInfo getPreviousConfigHistoryInfo(@RequestParam("dataId") String dataId,
-            @RequestParam("group") String group,
-            @RequestParam(value = "tenant", required = false, defaultValue = StringUtils.NULL) String tenant,
-            @RequestParam("id") Long id) throws AccessException {
+                                                          @RequestParam("group") String group,
+                                                          @RequestParam(value = "tenant", required = false, defaultValue = StringUtils.EMPTY) String tenant,
+                                                          @RequestParam("id") Long id) throws AccessException {
         return historyService.getPreviousConfigHistoryInfo(dataId, group, tenant, id);
     }
-    
+
     /**
      * Query configs list by namespace.
      *
@@ -133,5 +133,5 @@ public class HistoryController {
         tenant = NamespaceUtil.processNamespaceParameter(tenant);
         return historyService.getConfigListByNamespace(tenant);
     }
-    
+
 }
