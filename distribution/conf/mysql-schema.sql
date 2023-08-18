@@ -211,9 +211,9 @@ CREATE TABLE `roles` (
 
 CREATE TABLE `permissions` (
     `role` varchar(50) NOT NULL,
-    `resource` varchar(255) NOT NULL,
+    `resources` varchar(255) NOT NULL,
     `action` varchar(8) NOT NULL,
-    UNIQUE INDEX `uk_role_permission` (`role`,`resource`,`action`) USING BTREE
+    UNIQUE INDEX `uk_role_permission` (`role`,`resources`,`action`) USING BTREE
 );
 
 INSERT INTO users (username, password, enabled) VALUES ('nacos', '$2a$10$EuWPZHzz32dJN7jexM34MOeYirDdFAZm2kuWj7VEOJhhZkDrxfvUu', TRUE);
