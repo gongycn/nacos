@@ -143,7 +143,7 @@
         <proto-google-common-protos.version>2.17.0</proto-google-common-protos.version>
         <protobuf-java.version>3.22.3</protobuf-java.version>
         <protoc-gen-grpc-java.version>${grpc-java.version}</protoc-gen-grpc-java.version>
-        <hessian.version>4.0.63</hessian.version>
+        <hessian.version>4.0.4</hessian.version>
         <mockito-all.version>1.10.19</mockito-all.version>
         <mockito-core.version>3.8.0</mockito-core.version>
         <HikariCP.version>3.4.2</HikariCP.version>
@@ -151,6 +151,8 @@
         <rpc-grpc-impl.version>${jraft-core.version}</rpc-grpc-impl.version>
         <SnakeYaml.version>2.0</SnakeYaml.version>
         <spring-web.version>5.3.33</spring-web.version>
+        <!--oracle-->
+        <ojdbc8.version>21.9.0.0</ojdbc8.version>
     </properties>
     <!-- == -->
     <!-- =========================================================Build plugins================================================ -->
@@ -643,6 +645,17 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${ojdbc8.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.oracle.database.nls</groupId>
+                <artifactId>orai18n</artifactId>
+                <version>${ojdbc8.version}</version>
+            </dependency>
+            <dependency>
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -796,7 +809,7 @@
             <!-- hessian -->
             
             <dependency>
-                <groupId>com.caucho</groupId>
+                <groupId>com.alipay.sofa</groupId>
                 <artifactId>hessian</artifactId>
                 <version>${hessian.version}</version>
             </dependency>
