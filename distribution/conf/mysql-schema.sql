@@ -203,8 +203,8 @@ CREATE TABLE `roles` (
 
 CREATE TABLE `permissions` (
     `role` varchar(50) NOT NULL COMMENT 'role',
-    `resource` varchar(128) NOT NULL COMMENT 'resource',
+    `resources` varchar(128) NOT NULL COMMENT 'resource',
     `action` varchar(8) NOT NULL COMMENT 'action',
-    UNIQUE INDEX `uk_role_permission` (`role`,`resource`,`action`) USING BTREE
+    UNIQUE INDEX `uk_role_permission` (`role`,`resources`,`action`) USING BTREE
 );
 
