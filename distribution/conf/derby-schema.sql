@@ -205,9 +205,9 @@ CREATE TABLE roles (
 
 CREATE TABLE permissions (
     role varchar(50) NOT NULL,
-    resource varchar(512) NOT NULL,
+    resources varchar(512) NOT NULL,
     action varchar(8) NOT NULL,
-    constraint uk_role_permission UNIQUE (role,resource,action)
+    constraint uk_role_permission UNIQUE (role,resources,action)
 );
 
 
