@@ -116,7 +116,7 @@ public class ConfigInfoAggrMapperByOracle extends AbstractMapperByOracle impleme
 		}
 		String sql = "SELECT data_id,group_id,tenant_id,datum_id,app_name,content FROM config_info_aggr WHERE data_id= ? AND "
 				+ "group_id= ? AND tenant_id " + tenantIdQuery + " ORDER BY datum_id";
-		sql = buildPaginationSql(sql, startRow, pageSize);
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 

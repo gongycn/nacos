@@ -59,7 +59,7 @@ public class ConfigTagsRelationMapperByOracle extends AbstractMapperByOracle imp
 			paramList.add(tagArr[i]);
 		}
 		where.append(") ");
-		sql = buildPaginationSql(sql + where, startRow, pageSize);
+		sql = buildPaginationSql(sql + where, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -112,7 +112,7 @@ public class ConfigTagsRelationMapperByOracle extends AbstractMapperByOracle imp
 			paramList.add(tagArr[i]);
 		}
 		where.append(") ");
-		sqlFetchRows = buildPaginationSql(sqlFetchRows + where, startRow, pageSize);
+		sqlFetchRows = buildPaginationSql(sqlFetchRows + where, startRow, pageSize, paramList);
 		return new MapperResult(sqlFetchRows, paramList);
 	}
 

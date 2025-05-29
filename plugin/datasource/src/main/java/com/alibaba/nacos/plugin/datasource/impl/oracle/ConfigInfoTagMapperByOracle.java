@@ -16,11 +16,12 @@ public class ConfigInfoTagMapperByOracle extends AbstractMapperByOracle implemen
 	public MapperResult findAllConfigInfoTagForDumpAllFetchRows(MapperContext context) {
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
+		List<Object> paramList = new ArrayList<>();
 		String pageSql = " SELECT id FROM config_info_tag ORDER BY id ";
-		pageSql = buildPaginationSql(pageSql, startRow, pageSize);
+		pageSql = buildPaginationSql(pageSql, startRow, pageSize, paramList);
 		String sql = " SELECT t.id,data_id,group_id,tenant_id,tag_id,app_name,content,md5,gmt_modified "
 				+ " FROM ( " + pageSql + " ) " + "g, config_info_tag t  WHERE g.id = t.id  ";
-		return new MapperResult(sql, Collections.emptyList());
+		return new MapperResult(sql, paramList);
 	}
 
 	/**

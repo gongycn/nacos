@@ -34,7 +34,7 @@ public class HistoryConfigInfoMapperByOracle extends AbstractMapperByOracle impl
 		paramList.add(tenantId);
 		String sql = "SELECT nid,data_id,group_id,tenant_id,app_name,src_ip,src_user,op_type,gmt_create,gmt_modified FROM his_config_info "
 				+ "WHERE data_id = ? AND group_id = ? AND tenant_id " + tenantIdQuery + " ORDER BY nid DESC";
-		sql = buildPaginationSql(sql, startRow, pageSize);
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -53,6 +53,18 @@ public class HistoryConfigInfoMapperByOracle extends AbstractMapperByOracle impl
 		}
 		String sql = "SELECT nid,data_id,group_id,tenant_id,app_name,src_ip,src_user,op_type,gmt_create,gmt_modified FROM his_config_info "
 				+ "WHERE data_id = ? AND group_id = ? AND tenant_id " + tenantIdQuery + " ORDER BY nid DESC";
+		return new MapperResult(sql, paramList);
+	}
+
+	@Override
+	public MapperResult findDeletedConfig(MapperContext context) {
+		List<Object> paramList = CollectionUtils.list(context.getWhereParameter(FieldConstant.START_TIME),
+				context.getWhereParameter(FieldConstant.LAST_MAX_ID));
+		String sql = "SELECT data_id, group_id, tenant_id,gmt_modified,nid FROM his_config_info WHERE op_type = 'D' AND "
+				+ "gmt_modified >= ? and nid > ? order by nid";
+		int startRow = 0;
+		int pageSize = Integer.parseInt(String.valueOf(context.getWhereParameter(FieldConstant.PAGE_SIZE)));
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 }

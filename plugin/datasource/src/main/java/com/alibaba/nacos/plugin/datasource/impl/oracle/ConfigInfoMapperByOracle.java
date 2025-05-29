@@ -29,7 +29,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		paramList.add(appName);
 		String sql = "SELECT id,data_id,group_id,tenant_id,app_name,content FROM config_info"
 				+ " WHERE tenant_id " + tenantIdQuery + " AND app_name= ?";
-		sql = buildPaginationSql(sql, startRow, pageSize);
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -38,8 +38,9 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
 		String sql = "SELECT tenant_id FROM config_info WHERE tenant_id IS NOT NULL GROUP BY tenant_id ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, Collections.emptyList());
+		List<Object> paramList = new ArrayList<>();
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 	@Override
@@ -47,8 +48,9 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
 		String sql = "SELECT group_id FROM config_info WHERE tenant_id IS NULL GROUP BY group_id ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, Collections.emptyList());
+		List<Object> paramList = new ArrayList<>();
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 	@Override
@@ -65,7 +67,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 			paramList.add(tenantId);
 		}
 		String sql = " SELECT id,data_id,group_id,app_name FROM config_info WHERE tenant_id " + tenantIdQuery + " ORDER BY id ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -74,8 +76,9 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
 		String sql = "SELECT id,data_id,group_id,content,md5 FROM  config_info  ORDER BY id  ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, Collections.emptyList());
+		List<Object> paramList = new ArrayList<>();
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 	@Override
@@ -84,8 +87,9 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		int pageSize = context.getPageSize();
 		String sql = "SELECT id,data_id,group_id,tenant_id,app_name,content,md5,gmt_modified,type,encrypted_data_key "
 				+ "FROM config_info WHERE id > ? ORDER BY id ASC ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, CollectionUtils.list(context.getWhereParameter(FieldConstant.ID)));
+		List<Object> paramList = CollectionUtils.list(context.getWhereParameter(FieldConstant.ID));
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 	@Override
@@ -128,7 +132,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		}
 
 		String sql = sqlFetchRows + where + " AND id > " + context.getWhereParameter(FieldConstant.LAST_MAX_ID) + " ORDER BY id ASC";
-		sql = buildPaginationSql(sql, 0, context.getPageSize());
+		sql = buildPaginationSql(sql, 0, context.getPageSize(), paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -136,9 +140,10 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 	public MapperResult listGroupKeyMd5ByPageFetchRows(MapperContext context) {
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
+		List<Object> paramList = new ArrayList<>();
 		String sql = "SELECT id,data_id,group_id,tenant_id,app_name,md5,type,gmt_modified,encrypted_data_key from config_info  ORDER BY id ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, Collections.emptyList());
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 
@@ -166,7 +171,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 			paramList.add(content);
 		}
 		String sql = sqlFetchRows + where;
-		sql = buildPaginationSql(sql, startRow, pageSize);
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -205,7 +210,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 			where.append(" AND content LIKE ? ");
 			paramList.add(content);
 		}
-		sql = buildPaginationSql(sql + where, startRow, pageSize);
+		sql = buildPaginationSql(sql + where, startRow, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 
@@ -214,9 +219,9 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
 		String sql = "SELECT id,data_id,group_id,content FROM config_info WHERE group_id=? AND nvl(tenant_id, '" + TENANT_NULL + "') = nvl(?, '" + TENANT_NULL + "') ";
-
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, Collections.emptyList());
+		List<Object> paramList = new ArrayList<>();
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 	@Override
@@ -256,7 +261,7 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 			where.append(" AND content LIKE ? ");
 			paramList.add(content);
 		}
-		sqlFetchRows = buildPaginationSql(sqlFetchRows + where, startRow, pageSize);
+		sqlFetchRows = buildPaginationSql(sqlFetchRows + where, startRow, pageSize, paramList);
 		return new MapperResult(sqlFetchRows, paramList);
 	}
 
@@ -264,10 +269,11 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 	public MapperResult findAllConfigInfoFetchRows(MapperContext context) {
 		int startRow = context.getStartRow();
 		int pageSize = context.getPageSize();
+		List<Object> paramList = new ArrayList<>();
 		String sql = "SELECT id,data_id,group_id,tenant_id,app_name,content,md5 "
 				+ " FROM  config_info WHERE nvl(tenant_id, '" + TENANT_NULL + "') LIKE nvl(?, '" + TENANT_NULL + "') ORDER BY id ";
-		sql = buildPaginationSql(sql, startRow, pageSize);
-		return new MapperResult(sql, Collections.emptyList());
+		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
 	}
 
 	/**

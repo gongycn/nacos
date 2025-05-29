@@ -18,10 +18,13 @@ public abstract class AbstractMapperByOracle extends AbstractMapper {
 		return DataSourceConstant.ORACLE;
 	}
 
-	public String buildPaginationSql(String originalSql, int startRow, int pageSize) {
+	public String buildPaginationSql(String originalSql, int startRow, int pageSize, final List<Object> paramList) {
+		int end_row_num = startRow + pageSize;
+		paramList.add(end_row_num);
+		paramList.add(startRow);
 		String innerRowNumTable = "SELECT TMP.*, ROWNUM ROW_ID FROM ( " + originalSql
-				+ " ) TMP WHERE ROWNUM <=" + (startRow + pageSize);
-		return "SELECT * FROM ( " + innerRowNumTable + " ) WHERE ROW_ID > " + startRow;
+				+ " ) TMP WHERE ROWNUM <= ? ";
+		return "SELECT * FROM ( " + innerRowNumTable + " ) WHERE ROW_ID > ?";
 	}
 
 	/**
