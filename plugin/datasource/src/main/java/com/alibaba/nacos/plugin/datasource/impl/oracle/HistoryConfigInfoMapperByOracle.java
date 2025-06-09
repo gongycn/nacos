@@ -13,7 +13,17 @@ public class HistoryConfigInfoMapperByOracle extends AbstractMapperByOracle impl
 
 	@Override
 	public MapperResult removeConfigHistory(MapperContext context) {
-		String sql = "DELETE FROM his_config_info WHERE gmt_modified < ? LIMIT ?";
+		String sql = "DELETE FROM his_config_info " +
+				"WHERE rowid IN ( " +
+				"  SELECT rid " +
+				"  FROM ( " +
+				"    SELECT rowid AS rid " +
+				"    FROM his_config_info " +
+				"    WHERE gmt_modified < ? " +
+				"    ORDER BY gmt_modified ASC" +
+				"  ) " +
+				"  WHERE ROWNUM <= ? " +
+				")";
 		return new MapperResult(sql, CollectionUtils.list(context.getWhereParameter(FieldConstant.START_TIME),
 				context.getWhereParameter(FieldConstant.LIMIT_SIZE)));
 	}
