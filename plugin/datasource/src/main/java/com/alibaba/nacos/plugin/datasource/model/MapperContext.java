@@ -73,20 +73,23 @@ public class MapperContext {
 
     private Timestamp tryConvertToTimestamp(String key) {
         Object time = whereParamMap.get(key);
-        Timestamp result = null;
-        if (time != null && !(time instanceof Timestamp)) {
+        if (time == null) {
+            return null;
+        }
+        if (time instanceof Timestamp) {
+            return (Timestamp) time;
+        }
+        else {
+            Timestamp result;
             // 1. 处理 Java 8 LocalDateTime 系列 (最常见)
             if (time instanceof LocalDateTime) {
                 result = Timestamp.valueOf((LocalDateTime) time);
-            }
-            else if (time instanceof LocalDate) {
+            } else if (time instanceof LocalDate) {
                 // 只有日期时，自动补全为当天的 00:00:00
                 result = Timestamp.valueOf(((LocalDate) time).atStartOfDay());
-            }
-            else if (time instanceof OffsetDateTime) {
+            } else if (time instanceof OffsetDateTime) {
                 result = Timestamp.from(((OffsetDateTime) time).toInstant());
-            }
-            else if (time instanceof ZonedDateTime) {
+            } else if (time instanceof ZonedDateTime) {
                 result = Timestamp.from(((ZonedDateTime) time).toInstant());
             }
             // 2. 处理 传统 java.util.Date 系列
@@ -115,9 +118,11 @@ public class MapperContext {
                         throw new RuntimeException("无法解析时间字符串: " + strTime, ex);
                     }
                 }
+            } else {
+                throw new RuntimeException("无法解析为Timestamp类型: " + time.getClass().getName() + "，字符串值为：" + time);
             }
+            return result;
         }
-        return result;
     }
 
     /**
