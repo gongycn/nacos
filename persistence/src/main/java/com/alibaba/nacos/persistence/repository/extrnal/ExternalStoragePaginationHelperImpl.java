@@ -62,9 +62,16 @@ public class ExternalStoragePaginationHelperImpl<E> implements PaginationHelper 
         if (pageNo <= 0 || pageSize <= 0) {
             throw new IllegalArgumentException("pageNo and pageSize must be greater than zero");
         }
-        
+        int count = Long.valueOf(sqlCountRows.chars().filter(ch -> ch == '?').count()).intValue();
+        Object[] argsForCountRows = args;
+        if (args != null && count < args.length) {
+            argsForCountRows = new Object[count];
+            for (int i = 0; i < count; i++) {
+                argsForCountRows[i] = args[i];
+            }
+        }
         // Query the total number of current records.
-        Integer rowCountInt = jdbcTemplate.queryForObject(sqlCountRows, args, Integer.class);
+        Integer rowCountInt = jdbcTemplate.queryForObject(sqlCountRows, argsForCountRows, Integer.class);
         if (rowCountInt == null) {
             throw new IllegalArgumentException("fetchPageLimit error");
         }
