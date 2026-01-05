@@ -9,7 +9,6 @@ import com.alibaba.nacos.plugin.datasource.model.MapperResult;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements ConfigInfoMapper {
@@ -89,6 +88,16 @@ public class ConfigInfoMapperByOracle extends AbstractMapperByOracle implements 
 				+ "FROM config_info WHERE id > ? ORDER BY id ASC ";
 		List<Object> paramList = CollectionUtils.list(context.getWhereParameter(FieldConstant.ID));
 		sql = buildPaginationSql(sql, startRow, pageSize, paramList);
+		return new MapperResult(sql, paramList);
+	}
+	@Override
+	public MapperResult findChangeConfig(MapperContext context) {
+		int pageSize = context.getPageSize();
+		String sql = "SELECT id, data_id, group_id, tenant_id, app_name,md5, gmt_modified, encrypted_data_key FROM config_info WHERE "
+						+ "gmt_modified >= ? and id > ? order by id";
+		List<Object> paramList = CollectionUtils.list(context.getWhereParameter(FieldConstant.START_TIME),
+				context.getWhereParameter(FieldConstant.LAST_MAX_ID));
+		sql = buildPaginationSql(sql, 0, pageSize, paramList);
 		return new MapperResult(sql, paramList);
 	}
 

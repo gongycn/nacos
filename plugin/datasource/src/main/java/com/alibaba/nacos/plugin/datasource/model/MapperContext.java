@@ -16,6 +16,14 @@
 
 package com.alibaba.nacos.plugin.datasource.model;
 
+import com.alibaba.nacos.plugin.datasource.constants.FieldConstant;
+
+import java.util.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,9 +64,62 @@ public class MapperContext {
      * @return The value to which the key is mapped
      */
     public Object getWhereParameter(String key) {
+        if (FieldConstant.START_TIME.equals(key) || FieldConstant.END_TIME.equals(key)
+                || FieldConstant.GMT_CREATE.equals(key)) {
+            return tryConvertToTimestamp(key);
+        }
         return whereParamMap.get(key);
     }
-    
+
+    private Timestamp tryConvertToTimestamp(String key) {
+        Object time = whereParamMap.get(key);
+        Timestamp result = null;
+        if (time != null && !(time instanceof Timestamp)) {
+            // 1. 处理 Java 8 LocalDateTime 系列 (最常见)
+            if (time instanceof LocalDateTime) {
+                result = Timestamp.valueOf((LocalDateTime) time);
+            }
+            else if (time instanceof LocalDate) {
+                // 只有日期时，自动补全为当天的 00:00:00
+                result = Timestamp.valueOf(((LocalDate) time).atStartOfDay());
+            }
+            else if (time instanceof OffsetDateTime) {
+                result = Timestamp.from(((OffsetDateTime) time).toInstant());
+            }
+            else if (time instanceof ZonedDateTime) {
+                result = Timestamp.from(((ZonedDateTime) time).toInstant());
+            }
+            // 2. 处理 传统 java.util.Date 系列
+            else if (time instanceof Date) {
+                result = new Timestamp(((Date) time).getTime());
+            }
+            // 3. 处理 数值型 (毫秒时间戳)
+            else if (time instanceof Long) {
+                result = new Timestamp((Long) time);
+            }
+            // 4. 处理 字符串型 (最复杂，需考虑多种格式)
+            else if (time instanceof String) {
+                String strTime = ((String) time).trim().replace("T", " ");
+                try {
+                    if (strTime.length() == 10) { // yyyy-MM-dd
+                        strTime += " 00:00:00";
+                    }
+                    // 注意：Timestamp.valueOf 支持 yyyy-MM-dd HH:mm:ss.fffffffff 格式
+                    result = Timestamp.valueOf(strTime);
+                } catch (IllegalArgumentException e) {
+                    // 如果以上都失败，可以尝试使用标准 ISO 格式解析
+                    try {
+                        result = Timestamp.from(LocalDateTime.parse(strTime.replace(" ", "T"))
+                                .atZone(java.time.ZoneId.systemDefault()).toInstant());
+                    } catch (Exception ex) {
+                        throw new RuntimeException("无法解析时间字符串: " + strTime, ex);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     /**
      * Associates the value with the key in this map, it will contain the WHERE parameter in the SQL statement.
      *
