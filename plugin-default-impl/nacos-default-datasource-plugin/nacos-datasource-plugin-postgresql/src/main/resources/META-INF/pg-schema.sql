@@ -204,7 +204,7 @@ COMMENT ON TABLE "his_config_info" IS '多租户改造';
 DROP TABLE IF EXISTS "permissions";
 CREATE TABLE "permissions" (
   "role" varchar(50)  NOT NULL,
-  "resource" varchar(512)  NOT NULL,
+  "resources" varchar(512)  NOT NULL,
   "action" varchar(8)  NOT NULL
 )
 ;
@@ -378,7 +378,7 @@ ALTER TABLE "his_config_info" ADD CONSTRAINT "his_config_info_pkey" PRIMARY KEY 
 -- ----------------------------
 CREATE UNIQUE INDEX "uk_role_permission" ON "permissions" USING btree (
   "role",
-  "resource",
+  "resources",
   "action"
 );
 
