@@ -26,3 +26,8 @@ dependency-reduced-pom.xml
 .qoder/
 openspec/
 .codegraph
+.gitnexus
+.claude
+CLAUDE.md
+AGENTS.md
+.serena
