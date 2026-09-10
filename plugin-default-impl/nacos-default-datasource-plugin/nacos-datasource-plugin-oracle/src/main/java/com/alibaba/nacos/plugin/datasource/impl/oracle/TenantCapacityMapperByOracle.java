@@ -113,11 +113,11 @@ public class TenantCapacityMapperByOracle extends AbstractMapperByOracle
         paramList.add(context.getUpdateParameter(FieldConstant.GMT_CREATE));
         paramList.add(context.getUpdateParameter(FieldConstant.GMT_MODIFIED));
         paramList.add(context.getWhereParameter(FieldConstant.TENANT_ID));
-        
+
         return new MapperResult(
-            "INSERT INTO tenant_capacity (tenant_id, quota, usage, max_size, max_aggr_count, max_aggr_size, "
-                + "gmt_create, gmt_modified) SELECT ?, ?, count(*), ?, ?, ?, ?, ? FROM config_info WHERE tenant_id=? "
-                + "group by tenant_id",
-            paramList);
+                "INSERT INTO tenant_capacity (tenant_id, quota, usage, max_size, max_aggr_count, max_aggr_size, " +
+                        "gmt_create, gmt_modified) SELECT ?, ?, COUNT_VALUE, ?, ?, ?, ?, ? " +
+                        "FROM (SELECT COUNT(*) COUNT_VALUE FROM config_info WHERE tenant_id=?)",
+                paramList);
     }
 }
