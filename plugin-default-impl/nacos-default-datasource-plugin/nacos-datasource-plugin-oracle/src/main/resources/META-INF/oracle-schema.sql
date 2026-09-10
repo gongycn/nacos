@@ -142,8 +142,8 @@ CREATE TABLE tenant_info (
     tenant_name VARCHAR2(128) DEFAULT '',
     tenant_desc VARCHAR2(256) DEFAULT NULL,
     create_source VARCHAR2(32) DEFAULT NULL,
-    gmt_create TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
-    gmt_modified TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    gmt_create NUMBER ( 20, 0 ) NOT NULL,
+    gmt_modified NUMBER ( 20, 0 ) NOT NULL,
     CONSTRAINT tenant_info_id_key PRIMARY KEY (id),
     CONSTRAINT uk_tenant_info_kptenantid UNIQUE (kp, tenant_id)
 );

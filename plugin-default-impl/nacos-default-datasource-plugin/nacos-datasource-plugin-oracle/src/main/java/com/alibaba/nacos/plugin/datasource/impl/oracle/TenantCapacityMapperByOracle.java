@@ -116,7 +116,8 @@ public class TenantCapacityMapperByOracle extends AbstractMapperByOracle
         
         return new MapperResult(
             "INSERT INTO tenant_capacity (tenant_id, quota, usage, max_size, max_aggr_count, max_aggr_size, "
-                + "gmt_create, gmt_modified) SELECT ?, ?, count(*), ?, ?, ?, ?, ? FROM config_info WHERE tenant_id=?",
+                + "gmt_create, gmt_modified) SELECT ?, ?, count(*), ?, ?, ?, ?, ? FROM config_info WHERE tenant_id=? "
+                + "group by tenant_id",
             paramList);
     }
 }
